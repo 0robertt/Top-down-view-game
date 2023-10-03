@@ -1,23 +1,22 @@
+#All keys that are used: W, A, S, D, SPACE
 import pygame, sys, math
 from sys import exit
 import random
 from random import randint
 
 screen = pygame.display.set_mode((1000, 800))
+
 running = True
 clock = pygame.time.Clock()
 WIDTH = 1000
 HEIGHT = 800
 running = True
-score = 0
+wood = 0
 mousepos = pygame.mouse.get_pos()
-bullets = []
-bullet = pygame.image.load('C:\\Users\\Robert\\Downloads\\Bullet.png')
-cube_size = 30
+
+cube_size = 80
 cube_x = random.randint(0, WIDTH - cube_size)
 cube_y = random.randint(0, HEIGHT - cube_size)
-
-things = []
 
 class Thing:
     def __init__(self, x, y, width, height, image):
@@ -26,27 +25,11 @@ class Thing:
         self.width = width
         self.height = height
         self.image = image
-        self.velX = 0
-        self.velY = 0
-        things.append(self)
     def draw(self, screen):
         screen.blit(pygame.transform.scale(self.image, (self.width, self.height)), (self.x, self.y))
-    def update(self):
-         self.x += self.velX
-         self.y += self.velY
-         self.draw(screen)
 
     def get_center(self):
          return self.x + self.width / 2, self.y + self.height / 2
-
-class Entity(Thing):
-     def __init__(self, x, y, width, height, image, speed):
-          super().__init__(x, y, width, height, None)
-          self.speed = speed
-          self.image = image
-    
-     def draw(self, screen):
-        screen.blit(pygame.transform.scale(self.image, (self.width, self.height)), (self.x, self.y))
           
 
      
@@ -73,18 +56,9 @@ class Player:
         self.speed = 5
         self.width = 32
         self.height = 32
-        
-
-        #tools
-        self.selected_tool = 'axe'
     
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
-
-        
-    
-        
-        
 
         self.rect = pygame.Rect(int(self.x), int(self.y), 32, 32)
 
@@ -103,8 +77,6 @@ class Player:
         if keys[pygame.K_s]:
                 self.velY = self.speed
         
-            
-        #
         self.x += self.velX
         self.y += self.velY
 
@@ -118,23 +90,6 @@ class Player:
             self.y = 1570 -self.rect.bottom
     def get_center(self):
          return self.x + self.width / 2, self.y + self.height / 2
-    
-    def shoot():
-        player_center = player.get_center()
-        
-        
-        target_center = target.get_center()
-        bullet.vel = [target_center[0] - player_center[0], target_center[1] - player_center[1]]
-
-        bullets.append(bullet) 
-        
-       
-    
-    
-    
-    
-            
-        
     def update(self):
          self.x += self.velX
          self.y += self.velY
@@ -142,13 +97,23 @@ class Player:
     
 target = Thing(0, 0, 50, 50, pygame.image.load('C:\\Users\\Robert\\Downloads\\Cursor.png'))
 
-         
+class Nature:
+    def __init__(self, x, y, width, height, color):
+        
+        self.x = int(x)
+        self.y = int(y)
+        self.rect = pygame.Rect(self.x, self.y, width, height)
+        self.color = color
+        self.width = width
+        self.height = height
+        self.rect = pygame.Rect(self.x, self.y, 32, 32)
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
 
-             
-             
-
-
+tree = Nature(random.randint(0, WIDTH - 32), random.randint(0, HEIGHT - 32), 32, 32, (71, 46, 12))
+nature = []
 player = Player(WIDTH/2, HEIGHT/2)
+
 while True:
 
     for event in pygame.event.get():
@@ -157,79 +122,51 @@ while True:
             sys.exit()
 
         
-             
-            
-             
-             
-            
-   
-    
-    
     if running:
         
         if player.rect.colliderect(object.rect):
             object.rect.x, object.rect.y = randint(0, 800), randint(0, 800)
-            score += 1
-            print(score)
+            wood += 1
+            print(wood)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+                print("Mouse clicked")
+
+                for tree in nature:
+                    if tree.rect.collidepoint(mousepos):
+                        print('treemove')
+                        nature.remove(tree)
+        
 
         if object.rect.x < player.x:
-                object.rect.x += 1
+                object.rect.x += 2
         elif object.rect.x > player.x:
-                object.rect.x -= 1
+                object.rect.x -= 2
 
         if object.rect.y < player.y:
-                object.rect.y += 1
+                object.rect.y += 2
         elif object.rect.y > player.y:
-                object.rect.y -= 1
+                object.rect.y -= 2
 
         pygame.mouse.set_visible(False)
-        bullets.append(bullet)
-        
-        
-
-        
-             
-        
-        
-
-            
-        
-        
-             
-        
-    
-    
-        
-        
-
-        #Movement
         player.input()
-       
-        for thi in things:
-            thi.update()
-        
-        
-    
         screen.fill((48, 48, 48))  
         player.draw(screen)
         object.draw(screen)
+        tree.draw(screen)
+        random.randint(0, WIDTH - cube_size)
         mousePos = pygame.mouse.get_pos()
         target.x = mousePos[0] - target.width / 2
         target.y = mousePos[1] - target.height / 2
         screen.blit(pygame.image.load('C:\\Users\\Robert\\Downloads\\Cursor.png'), (target.x , target.y))
+        if event.type == pygame.MOUSEBUTTONDOWN and wood >= 5:
+            cube_x = mousePos[0] - target.width / 2
+            cube_y = mousePos[1] - target.height / 2
+            wood -= 5
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            screen.blit(bullet, [target.x - player.x, target.y - player.y])
+            pygame.draw.rect(screen, (255, 0, 0), (player.rect.centerx - cube_size/2 , player.rect.centery - cube_size/2, cube_size, cube_size), 2)
 
-        pygame.draw.rect(screen, (255, 0, 0), (cube_x, cube_y, cube_size, cube_size))
-        print(player.x)
         pygame.display.update()
-
-    
-        
         pygame.display.flip()
 
         clock.tick(60)
-     
-        
-
