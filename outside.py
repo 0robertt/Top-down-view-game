@@ -4,9 +4,6 @@ import random
 from random import randint
 
 screen = pygame.display.set_mode((1000, 800))
-player1 = pygame.image.load('C:\\Users\\Robert\\Downloads\\topdown\\topplayer.png')
-
-ground = pygame.image.load('C:\\Users\\Robert\\Downloads\\topdown\\Groundeagle.png')
 running = True
 clock = pygame.time.Clock()
 WIDTH = 1000
